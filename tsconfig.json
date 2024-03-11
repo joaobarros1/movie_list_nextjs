@@ -27,7 +27,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "app/GlobalRedux/moviesSlice.js",
-    "app/GlobalRedux/Features/moviesSlice.js"
+    "app/GlobalRedux/Features/moviesSlice.tsx"
   ],
   "exclude": ["node_modules"]
 }

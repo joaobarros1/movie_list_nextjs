@@ -1,126 +1,154 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "./GlobalRedux/store";
+import { useEffect, useState } from "react";
 import { fetchMovies } from "./GlobalRedux/Features/movies.thunks";
-import { RootState } from "./GlobalRedux/store";
-
-import axios from "axios";
-
-type Movie = {
-  adult: boolean;
-  backdrop_path: string;
-  genre_ids: number[];
-  id: number;
-  media_type: string;
-  original_language: string;
-  original_title: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  release_date: string;
-  title: string;
-  video: boolean;
-  vote_average: number;
-  vote_count: number;
-};
+// import filterMovies from "./GlobalRedux/Features/moviesSlice";
+import Pagination from "./components/Pagination";
 
 export default function Home() {
-  const dispatch = useDispatch();
-  // const movies = useSelector((state: RootState) => state.movies.movies);
-  const loading = useSelector((state: RootState) => state.movies.loading);
-  const error = useSelector((state: RootState) => state.movies.error);
+  const [sortField, setSortField] = useState<string>("title"); // Default sort field
+  const [sortOrder, setSortOrder] = useState<string>("asc"); // Default sort order
+  const [currentPage, setCurrentPage] = useState<number>(1); // Current active page
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  // const [totalPages, setTotalPages] = useState<number>(1);
 
-  const [movies, setMovies] = useState<Movie[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
 
-  const TMDB_API_KEY = process.env.TMDB_API_KEY;
-  const TMDB_BASE_URL = "https://api.themoviedb.org/3";
-  const time_window = "week";
+  const { movies, loading, error } = useSelector(
+    (state: RootState) => state.movies
+  );
 
-  const getMovies = async () => {
-    try {
-      const response = await axios.get(
-        `${TMDB_BASE_URL}/trending/movie/${time_window}?api_key=${TMDB_API_KEY}`
-      );
-      console.log("Fetched movies:", response.data);
-      return setMovies(response.data.results);
-    } catch (error) {
-      console.error("Error fetching movies:", error);
-      throw error;
+  useEffect(() => {
+    dispatch(fetchMovies(currentPage));
+  }, [dispatch, currentPage]);
+
+  const sortedMovies = Array.isArray(movies.results)
+    ? [...movies.results].sort((a, b) => {
+        if (sortField === "title") {
+          return a.title.localeCompare(b.title);
+        } else if (sortField === "avarage") {
+          return a.vote_average - b.vote_average;
+        } else if (sortField === "release") {
+          return (
+            new Date(a.release_date).getTime() -
+            new Date(b.release_date).getTime()
+          );
+        }
+        return 0;
+      })
+    : [];
+
+  if (sortOrder === "desc") {
+    sortedMovies.reverse();
+  }
+
+  const handleSort = (field: string) => {
+    if (field === sortField) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
     }
   };
 
-  useEffect(() => {
-    // fetchMovies();
-    // console.log("Movies:", movies);
-    getMovies();
-  }, []);
+  // const handleSearchTermChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setSearchTerm(e.target.value);
+  // };
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <div>
-      <h1>Movies</h1>
-      {/* {loading ? (
-      <p>Loading...</p>
-    ) : error ? (
-      <p>Error: {error}</p>
-    ) : ( */}
-      <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <div className="overflow-hidden border-b border-gray-200 sm:rounded-lg">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  id="title"
-                >
-                  Title
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  id="avarage"
-                >
-                  Vote avarage
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  id="release"
-                >
-                  Release date
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {movies &&
-                movies.map((movie) => (
+      <h1 className="text-3xl font-bold text-gray-300 text-center mt-5">
+        Movies
+      </h1>
+      {/* <input
+        type="text"
+        placeholder="Search..."
+        value={searchTerm}
+        onChange={(e) => handleSearchTermChange(e)}
+        className="block mt-5 mx-auto w-80 p-2 rounded-md border border-gray-300 text-gray-500"
+      /> */}
+      {loading ? (
+        <div className="flex justify-center items-center h-screen">
+          <p className="text-center">Loading...</p>
+        </div>
+      ) : error ? (
+        <p>Error: {error}</p>
+      ) : (
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <div className="border-b border-gray-200 sm:rounded-lg overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                    id="title"
+                    onClick={() => handleSort("title")}
+                  >
+                    Title
+                    {sortField === "title" && (
+                      <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                    )}
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                    id="avarage"
+                    onClick={() => handleSort("avarage")}
+                  >
+                    Vote avarage
+                    {sortField === "avarage" && (
+                      <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                    )}
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                    id="release"
+                    onClick={() => handleSort("release")}
+                  >
+                    Release date
+                    {sortField === "release" && (
+                      <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                    )}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {sortedMovies.map((movie) => (
                   <tr key={movie.id}>
-                    <td
-                      className="px-6 py-4 whitespace-nowrap font-medium text-gray-500"
-                      id="title"
-                    >
+                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-500">
                       {movie.title}
                     </td>
-                    <td
-                      className="px-6 py-4 whitespace-nowrap font-medium text-gray-500"
-                      id="avarage"
-                    >
+                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-500">
                       {movie.vote_average.toFixed(1)}
                     </td>
-                    <td
-                      className="px-6 py-4 whitespace-nowrap font-medium text-gray-500"
-                      id="release"
-                    >
+                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-500">
                       {movie.release_date}
                     </td>
+                    {/* <td>
+                      <button onClick={() => handleRemoveClick(movie.id)}>
+                        Remove
+                      </button>
+                    </td> */}
                   </tr>
                 ))}
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
+          <Pagination
+            currentPage={currentPage}
+            // totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         </div>
-      </div>
-      {/* )} */}
+      )}
     </div>
   );
 }
