@@ -93,34 +93,40 @@ export default function Home() {
                 <tr>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                    className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                      !searchTerm ? "cursor-pointer" : ""
+                    }`}
                     id="title"
                     onClick={() => handleSort("title")}
                   >
                     Title
-                    {sortField === "title" && (
+                    {sortField === "title" && !searchTerm && (
                       <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
                     )}
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                    className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                      !searchTerm ? "cursor-pointer" : ""
+                    }`}
                     id="avarage"
                     onClick={() => handleSort("avarage")}
                   >
                     Vote avarage
-                    {sortField === "avarage" && (
+                    {sortField === "avarage" && !searchTerm && (
                       <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
                     )}
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                    className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                      !searchTerm ? "cursor-pointer" : ""
+                    }`}
                     id="release"
                     onClick={() => handleSort("release")}
                   >
                     Release date
-                    {sortField === "release" && (
+                    {sortField === "release" && !searchTerm && (
                       <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
                     )}
                   </th>
@@ -128,7 +134,7 @@ export default function Home() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {searchTerm
-                  ? filteredMovies.map((filteredMovie) => (
+                  ? filteredMovies?.map((filteredMovie) => (
                       <tr key={filteredMovie.id}>
                         <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-500">
                           {filteredMovie.title}
@@ -162,11 +168,13 @@ export default function Home() {
               </tbody>
             </table>
           </div>
-          <Pagination
-            currentPage={currentPage}
-            // totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
+          {!searchTerm && (
+            <Pagination
+              currentPage={currentPage}
+              // totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
         </div>
       )}
     </div>
