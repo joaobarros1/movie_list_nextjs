@@ -8,9 +8,9 @@ import { fetchMovies } from "./GlobalRedux/Features/movies.thunks";
 import Pagination from "./components/Pagination";
 
 export default function Home() {
-  const [sortField, setSortField] = useState<string>("title"); // Default sort field
-  const [sortOrder, setSortOrder] = useState<string>("asc"); // Default sort order
-  const [currentPage, setCurrentPage] = useState<number>(1); // Current active page
+  const [sortField, setSortField] = useState<string>("title");
+  const [sortOrder, setSortOrder] = useState<string>("asc");
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchTerm, setSearchTerm] = useState<string>("");
   // const [totalPages, setTotalPages] = useState<number>(1);
 
