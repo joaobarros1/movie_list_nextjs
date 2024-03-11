@@ -4,8 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "./GlobalRedux/store";
 import { useEffect, useState } from "react";
 import { fetchMovies } from "./GlobalRedux/Features/movies.thunks";
-// import filterMovies from "./GlobalRedux/Features/moviesSlice";
 import Pagination from "./components/Pagination";
+import { filterMovies } from "./GlobalRedux/Features/moviesSlice";
+import Image from "next/image";
 
 export default function Home() {
   const [sortField, setSortField] = useState<string>("title");
@@ -16,7 +17,7 @@ export default function Home() {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const { movies, loading, error } = useSelector(
+  const { movies, loading, error, filteredMovies } = useSelector(
     (state: RootState) => state.movies
   );
 
@@ -53,9 +54,13 @@ export default function Home() {
     }
   };
 
-  // const handleSearchTermChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setSearchTerm(e.target.value);
-  // };
+  const handleSearchTermChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+  useEffect(() => {
+    dispatch(filterMovies(searchTerm));
+  }, [searchTerm, dispatch]);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -63,16 +68,17 @@ export default function Home() {
 
   return (
     <div>
+      {/* <Image quality={50} /> */}
       <h1 className="text-3xl font-bold text-gray-300 text-center mt-5">
         Movies
       </h1>
-      {/* <input
+      <input
         type="text"
         placeholder="Search..."
         value={searchTerm}
         onChange={(e) => handleSearchTermChange(e)}
         className="block mt-5 mx-auto w-80 p-2 rounded-md border border-gray-300 text-gray-500"
-      /> */}
+      />
       {loading ? (
         <div className="flex justify-center items-center h-screen">
           <p className="text-center">Loading...</p>
@@ -121,24 +127,38 @@ export default function Home() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {sortedMovies.map((movie) => (
-                  <tr key={movie.id}>
-                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-500">
-                      {movie.title}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-500">
-                      {movie.vote_average.toFixed(1)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-500">
-                      {movie.release_date}
-                    </td>
-                    {/* <td>
+                {searchTerm
+                  ? filteredMovies.map((filteredMovie) => (
+                      <tr key={filteredMovie.id}>
+                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-500">
+                          {filteredMovie.title}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-500">
+                          {filteredMovie.vote_average.toFixed(1)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-500">
+                          {filteredMovie.release_date}
+                        </td>
+                      </tr>
+                    ))
+                  : sortedMovies.map((movie) => (
+                      <tr key={movie.id}>
+                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-500">
+                          {movie.title}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-500">
+                          {movie.vote_average.toFixed(1)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-500">
+                          {movie.release_date}
+                        </td>
+                        {/* <td>
                       <button onClick={() => handleRemoveClick(movie.id)}>
                         Remove
                       </button>
                     </td> */}
-                  </tr>
-                ))}
+                      </tr>
+                    ))}
               </tbody>
             </table>
           </div>

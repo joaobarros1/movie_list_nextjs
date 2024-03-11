@@ -1,6 +1,6 @@
 "use client";
 
-import { createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { fetchMovies } from "./movies.thunks";
 
 interface MoviesResponse {
@@ -8,14 +8,13 @@ interface MoviesResponse {
   results: Movie[];
   total_pages: number;
   total_results: number;
-  filter: (searchValue: object) => [];
 }
 
 interface MoviesState {
   movies: MoviesResponse;
   loading: boolean;
   error?: string;
-  filteredMovies: [];
+  filteredMovies: Movie[];
   searchTerm: "";
 }
 
@@ -37,6 +36,11 @@ export interface Movie {
   vote_count: number;
 }
 
+export interface MoviesReducerAction {
+  type: string;
+  payload: string;
+}
+
 const initialState: MoviesState = {
   movies: <MoviesResponse>{},
   loading: false,
@@ -51,6 +55,11 @@ const moviesSlice = createSlice({
   reducers: {
     moviesReducer: (state, action) => {
       state.movies = action.payload;
+    },
+    filterMovies: (state, action: PayloadAction<string>) => {
+      state.filteredMovies = state.movies.results?.filter((movie) => {
+        return movie.title.toLowerCase().includes(action.payload.toLowerCase());
+      });
     },
   },
   extraReducers: (builder) => {
@@ -71,3 +80,5 @@ const moviesSlice = createSlice({
 });
 
 export default moviesSlice.reducer;
+
+export const { moviesReducer, filterMovies } = moviesSlice.actions;

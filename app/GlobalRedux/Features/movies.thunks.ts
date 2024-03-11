@@ -1,5 +1,3 @@
-"use client";
-
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
@@ -13,7 +11,13 @@ export const fetchMovies = createAsyncThunk(
   async (page: number) => {
     try {
       const response = await axios.get(
-        `${TMDB_BASE_URL}/trending/movie/${time_window}?api_key=${TMDB_API_KEY}&page=${page}`
+        `${TMDB_BASE_URL}/trending/movie/${time_window}`,
+        {
+          params: {
+            api_key: TMDB_API_KEY,
+            page: page,
+          },
+        }
       );
       return response.data;
     } catch (error) {
