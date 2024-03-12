@@ -93,33 +93,45 @@ export default function Home() {
                 <tr>
                   <th
                     scope="col"
-                    className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                    className={`px-6 py-3 lg:w-40 whitespace-nowrap text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
                       !searchTerm ? "cursor-pointer" : ""
                     }`}
                     id="title"
                     onClick={() => handleSort("title")}
                   >
                     Title
-                    {sortField === "title" && !searchTerm && (
-                      <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                    {!searchTerm && (
+                      <span
+                        className={
+                          sortField !== "title" ? "text-transparent" : ""
+                        }
+                      >
+                        {sortOrder === "asc" ? " ▲" : " ▼"}
+                      </span>
                     )}
                   </th>
                   <th
                     scope="col"
-                    className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                    className={`px-6 py-3 lg:w-40 whitespace-nowrap text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
                       !searchTerm ? "cursor-pointer" : ""
                     }`}
                     id="avarage"
                     onClick={() => handleSort("avarage")}
                   >
                     Vote avarage
-                    {sortField === "avarage" && !searchTerm && (
-                      <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                    {!searchTerm && (
+                      <span
+                        className={
+                          sortField !== "avarage" ? "text-transparent" : ""
+                        }
+                      >
+                        {sortOrder === "asc" ? " ▲" : " ▼"}
+                      </span>
                     )}
                   </th>
                   <th
                     scope="col"
-                    className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                    className={`px-6 py-3 lg:w-40 whitespace-nowrap text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
                       !searchTerm ? "cursor-pointer" : ""
                     }`}
                     id="release"
@@ -127,7 +139,13 @@ export default function Home() {
                   >
                     Release date
                     {sortField === "release" && !searchTerm && (
-                      <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                      <span
+                        className={
+                          sortField !== "release" ? "text-transparent" : ""
+                        }
+                      >
+                        {sortOrder === "asc" ? " ▲" : " ▼"}
+                      </span>
                     )}
                   </th>
                 </tr>
